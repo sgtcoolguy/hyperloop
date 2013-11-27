@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+var commands = require('../lib/commands'),
+	hyperloop = require('..'),
+	log = require('../lib/log'),
+	program = require('commander');
+
+program
+	.usage('[options]')
+	.description('Compile a hyperloop app');
+
+// prepare and sort options
+commands.prepareOptions(program, { compile: true });
+
+// parse the arguments
+program.parse(process.argv);
+
+// process the defaults now
+commands.processDefaultOptions(program);
+
+hyperloop.compile(program, program.args, function(err) {
+	if (err) { throw err; }
+	log.info('compile complete');
+});

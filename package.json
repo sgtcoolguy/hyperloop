@@ -12,7 +12,10 @@
     }
   ],
   "bin": {
-    "hyperloop": "./bin/hyperloop"
+    "hyperloop": "./bin/hyperloop",
+    "hyperloop-clean": "./bin/hyperloop-clean",
+    "hyperloop-compile": "./bin/hyperloop-compile",
+    "hyperloop-package": "./bin/hyperloop-package"
   },
   "scripts": {
     "test": "grunt test"
@@ -42,7 +45,8 @@
     "semver": "2.2.1",
     "node-uuid": "1.4.1",
     "node-appc": "0.1.30",
-    "zipper": "0.3.0"
+    "zipper": "0.3.0",
+    "commander": "~2.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

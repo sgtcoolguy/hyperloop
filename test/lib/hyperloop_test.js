@@ -7,58 +7,19 @@ var FATAL = 'fatal';
 
 describe('lib/hyperloop.js', function() {
 
-	describe('#getCommands', function() {
-
-		it('returns an array of supported commands', function() {
-			var commands = hyperloop.getCommands();
-			should.exist(commands);
-			commands.should.be.an.Array;
-			commands.length.should.be.above(0);
-			_.find(commands, function(c) { return c.name === 'compile'; }).should.be.ok;
-		});
-
-		it('returned commands have #getName and #getHelp', function() {
-			var commands = hyperloop.getCommands();
-			should.exist(commands);
-			commands.should.be.an.Array;
-			commands.length.should.be.above(0);
-
-			var cmd = commands[0];
-			var name = cmd.getName();
-			var help = cmd.getHelp();
-			name.should.be.a.String;
-			name.should.equal(cmd.name);
-			help.should.be.a.String;
-			help.should.equal(cmd.description);
-		});
-
+	it('exports clean', function() {
+		should.exist(hyperloop.clean);
+		hyperloop.clean.should.be.a.Function;
 	});
 
-	describe('#run', function() {
+	it('exports compile', function() {
+		should.exist(hyperloop.compile);
+		hyperloop.compile.should.be.a.Function;
+	});
 
-		beforeEach(function() {
-			this._fatal = log.fatal;
-			log.fatal = function() {
-				throw new Error(arguments[0] || FATAL);
-			};
-		});
-
-		it('aborts when no argument is given', function() {
-			(function() {
-				hyperloop.run();
-			}).should.throw(/invalid command/);
-		});
-
-		it('throws without options, but not a conversion error', function() {
-			(function() {
-				hyperloop.run('compile');
-			}).should.throw(/^(?:(?!null to object).)*$/);
-		});
-
-		afterEach(function() {
-			log.fatal = this._fatal;
-		});
-
+	it('exports package', function() {
+		should.exist(hyperloop.package);
+		hyperloop.package.should.be.a.Function;
 	});
 
 });

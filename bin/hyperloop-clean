@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+
+var commands = require('../lib/commands'),
+	hyperloop = require('..'),
+	log = require('../lib/log'),
+	program = require('commander');
+
+program
+	.usage('[options]')
+	.description('Cleans all compile/package related files')
+	.option('-m, --metabase', 'Delete the cached metabase');
+
+// prepare and sort options
+commands.prepareOptions(program);
+
+// parse the arguments
+program.parse(process.argv);
+
+// process the defaults now
+commands.processDefaultOptions(program);
+
+// execute clean with the given options
+hyperloop.clean(program, program.args, function(err) {
+	if (err) { throw err; }
+	log.info('clean complete');
+});
