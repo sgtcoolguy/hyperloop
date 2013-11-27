@@ -3,7 +3,7 @@
 
 using namespace Windows::UI::Xaml::Media;
 
-class Windows_UI_Xaml_Media_SolidColorBrush
+class Windows_UI_Xaml_Media_RotateTransform
 {
 public:
 
@@ -12,25 +12,24 @@ public:
 		classDefinition.callAsConstructor = classConstructor;
 		JSClassRef clsRef = JSClassCreate(&classDefinition);
 		JSObjectRef classDef = JSObjectMake(ctx, clsRef, NULL);
-		JSStringRef className = JSStringCreateWithUTF8CString("SolidColorBrush");
+		JSStringRef className = JSStringCreateWithUTF8CString("RotateTransform");
 		JSObjectSetProperty(ctx, global, className, classDef, kJSPropertyAttributeNone, NULL);
 	}
 
 	static JSObjectRef classConstructor(JSContextRef ctx, JSObjectRef constructor, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
 		PrivateObjectContainer* poc = new PrivateObjectContainer();
-		SolidColorBrush^ nobj = ref new SolidColorBrush();
+		RotateTransform^ nobj = ref new RotateTransform();
 		poc->set(nobj);
 		JSClassDefinition classDefinition = kJSClassDefinitionEmpty;		
 		classDefinition.finalize = classDestructor;
-		JSStaticValue StaticValueArray[] = {{ "Color", GetColor, SetColor, kJSPropertyAttributeNone }, 
+		JSStaticValue StaticValueArray[] = {{ "Angle", GetAngle, SetAngle, kJSPropertyAttributeNone }, 		                    
 		                                    { 0, 0, 0, 0 }
 		                                    };
 		
 		classDefinition.staticValues = StaticValueArray; 
 		JSClassRef clsRef = JSClassCreate(&classDefinition);
 		JSObjectRef classDef = JSObjectMake(ctx, clsRef, poc);
-
-		return classDef;
+		return classDef; 
 	}
 
 	static void classDestructor(JSObjectRef object) {
@@ -38,28 +37,18 @@ public:
 		reinterpret_cast<PrivateObjectContainer*>(raw)->clean();
 	}
 
-	static bool SetColor(JSContextRef ctx, JSObjectRef thisObject,  JSStringRef propertyName, const JSValueRef value, JSValueRef* exception) {
+	static bool SetAngle(JSContextRef ctx, JSObjectRef thisObject,  JSStringRef propertyName, const JSValueRef value, JSValueRef* exception) {
 		void* raw = JSObjectGetPrivate(thisObject);
-		SolidColorBrush^ nobj = (SolidColorBrush^)reinterpret_cast<PrivateObjectContainer*>(raw)->get();
+		RotateTransform^ nobj = (RotateTransform^)reinterpret_cast<PrivateObjectContainer*>(raw)->get();
 		double nVal = JSValueToNumber(ctx, value, NULL);
-
-		if (nVal == 0)
-			nobj->Color =  Colors::Red; 
-		if (nVal == 1)
-			nobj->Color =  Colors::Yellow; 
-		if (nVal == 2)
-			nobj->Color =  Colors::Green; 
-		if (nVal == 3)
-			nobj->Color =  Colors::Blue; 
-
+		nobj->Angle = nVal;
 		return true;
 	}
 
-	static JSValueRef GetColor(JSContextRef ctx, JSObjectRef thisObject,  JSStringRef propertyName, JSValueRef* exception) {
+	static JSValueRef GetAngle(JSContextRef ctx, JSObjectRef thisObject,  JSStringRef propertyName, JSValueRef* exception) {
 		void* raw = JSObjectGetPrivate(thisObject);
-		SolidColorBrush^ nobj = (SolidColorBrush^)reinterpret_cast<PrivateObjectContainer*>(raw)->get();
-		return  JSValueMakeNumber(ctx, 0); //nobj->Color); 
+		RotateTransform^ nobj = (RotateTransform^)reinterpret_cast<PrivateObjectContainer*>(raw)->get();
+		return  JSValueMakeNumber(ctx, nobj->Angle); 
 	}
-
 };
 
