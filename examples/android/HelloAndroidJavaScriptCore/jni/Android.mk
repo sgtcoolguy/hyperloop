@@ -33,5 +33,5 @@ include $(BUILD_SHARED_LIBRARY)
 # in all import paths:
 #$(call import-module,ALmixer)
 #$(call import-module,openal-soft)
-$(call import-module,BUILD_webkit2)
+$(call import-module,JavaScriptCore)
 
