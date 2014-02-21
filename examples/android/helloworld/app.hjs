@@ -1,0 +1,5 @@
+//@import("android.util.Log");
+
+//Log.v("Hello World from JavaScript");
+android.util.Log.v("MyTag", "Hello World from JavaScript");
+
