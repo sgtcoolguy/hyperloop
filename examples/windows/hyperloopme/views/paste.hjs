@@ -52,24 +52,6 @@ exports.show = show;
 	}
 ]);
 
-@class('PasteDoneTapHandler', null, [], [
-	{
-		name: 'PointerPressed',
-		forHandler: 'TappedEventHandler',
-		returnType: 'void',
-		arguments: [
-			{ name: 'sender', type: 'Object^' },
-			{ name: 'e', type: 'TappedRoutedEventArgs^' }
-		],
-		action: function() {
-			var bitmap = new RenderTargetBitmap();
-			bitmap.RenderAsync(global.canvas).then(function() {
-				share.show(bitmap);
-			});
-		}
-	}
-]);
-
 var imageRoot = 'https://dl.dropboxusercontent.com/u/16441391/temp/hyperloopme/',
 	lastIndex = 0,
 	images = [
@@ -97,41 +79,6 @@ var imageRoot = 'https://dl.dropboxusercontent.com/u/16441391/temp/hyperloopme/'
 		200/205
 	];
 
-@class('PasteAddTapHandler', null, [], [
-	{
-		name: 'PointerPressed',
-		forHandler: 'TappedEventHandler',
-		returnType: 'void',
-		arguments: [
-			{ name: 'sender', type: 'Object^' },
-			{ name: 'e', type: 'TappedRoutedEventArgs^' }
-		],
-		action: function() {
-			var handler = new ManipulationHandler(),
-				delta = new ManipulationDeltaEventHandler(handler, 'ManipulationDelta'),
-				background = new ImageBrush(),
-				view = new Canvas(),
-				index = lastIndex++ % images.length,
-				ratio = ratios[index],
-				height = (Math.random() * 200 + 100) | 0,
-				width = height * ratio,
-				uri = new Uri(imageRoot + images[index]);
-
-			deltas.push(delta);
-
-			background.ImageSource = new BitmapImage(uri);
-			view.Background = background;
-			view.Width = width;
-			view.Height = height;
-			Canvas.SetTop(view, (Math.random() * (global.canvas.Height - view.Height)) | 0);
-			Canvas.SetLeft(view, (Math.random() * (global.canvas.Width - view.Width)) | 0);
-			view.ManipulationMode = ManipulationModes.All;
-			view.add_ManipulationDelta(delta);
-			global.canvas.Children.Append(view);
-		}
-	}
-]);
-
 /*
  Implementation.
  */
@@ -157,13 +104,44 @@ function show(image) {
 	container.Children.Append(Tray([
 		{
 			text: 'Add',
-			handler: new TappedEventHandler(new PasteAddTapHandler(), 'PointerPressed')
+			handler: pasteAddTapHandler
 		},
 		{
 			text: 'Done',
-			handler: new TappedEventHandler(new PasteDoneTapHandler(), 'PointerPressed')
+			handler: pasteDoneTapHandler
 		}
 	]));
 
 	window.Content = container;
+}
+
+function pasteAddTapHandler() {
+	var handler = new ManipulationHandler(),
+		delta = new ManipulationDeltaEventHandler(handler, 'ManipulationDelta'),
+		background = new ImageBrush(),
+		view = new Canvas(),
+		index = lastIndex++ % images.length,
+		ratio = ratios[index],
+		height = (Math.random() * 200 + 100) | 0,
+		width = height * ratio,
+		uri = new Uri(imageRoot + images[index]);
+
+	deltas.push(delta);
+
+	background.ImageSource = new BitmapImage(uri);
+	view.Background = background;
+	view.Width = width;
+	view.Height = height;
+	Canvas.SetTop(view, (Math.random() * (global.canvas.Height - view.Height)) | 0);
+	Canvas.SetLeft(view, (Math.random() * (global.canvas.Width - view.Width)) | 0);
+	view.ManipulationMode = ManipulationModes.All;
+	view.add_ManipulationDelta(delta);
+	global.canvas.Children.Append(view);
+}
+
+function pasteDoneTapHandler() {
+	var bitmap = new RenderTargetBitmap();
+	bitmap.RenderAsync(global.canvas).then(function() {
+		share.show(bitmap);
+	});
 }
