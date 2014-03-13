@@ -1,5 +1,4 @@
 var transformOrigin = Point(.5, .5),
-	deltas = [],
 	window = Window.Current,
 	canvas = new Canvas(),
 	colors = {
@@ -9,33 +8,41 @@ var transformOrigin = Point(.5, .5),
 		yellow: new SolidColorBrush(Colors.Yellow)
 	};
 
-@class('ManipulationHandler', null, [], [
-	{
-		name: 'ManipulationDelta',
-		forHandler: 'ManipulationDeltaEventHandler',
-		returnType: 'void',
-		arguments: [
-			{ name: 'sender', type: 'Object^' },
-			{ name: 'e', type: 'ManipulationDeltaRoutedEventArgs^' }
-		],
-		action: function (params) {
-			var e = params.e,
-				view = @cast('Canvas^', e.OriginalSource),
-				transformGroup = new TransformGroup();
+canvas.Background = colors.blue;
+canvas.Width = window.Bounds.Width;
+canvas.Height = window.Bounds.Height;
 
-			!this.angle && (this.angle = { R: 0 });
-			!this.translation && (this.translation = { X: 0, Y: 0 });
+var seed = 1;
+function random() {
+	var x = Math.sin(seed++) * 10000;
+	return x - Math.floor(x);
+}
+
+for (var i = 0; i < 3; i++) {
+	(function() {
+		var view = new Canvas(),
+			angle = { R: 0 },
+			translation = { X: 0, Y: 0 };
+
+		view.Width = view.Height = (random() * 200 + 100) | 0;
+		Canvas.SetTop(view, (random() * (canvas.Height - view.Height)) | 0);
+		Canvas.SetLeft(view, (random() * (canvas.Width - view.Width)) | 0);
+
+		view.ManipulationMode = ManipulationModes.All;
+		view.add_ManipulationDelta(function(object, e) {
+			var view = @cast('Canvas^', e.OriginalSource),
+				transformGroup = new TransformGroup();
 
 			// Rotate.
 			view.RenderTransformOrigin = transformOrigin;
 			var rotateTransform = new RotateTransform();
-			rotateTransform.Angle = (this.angle.R += e.Delta.Rotation);
+			rotateTransform.Angle = (angle.R += e.Delta.Rotation);
 			transformGroup.Children.Append(rotateTransform);
 
 			// Translate.
 			var translateTransform = new TranslateTransform();
-			translateTransform.X = (this.translation.X += e.Delta.Translation.X);
-			translateTransform.Y = (this.translation.Y += e.Delta.Translation.Y);
+			translateTransform.X = (translation.X += e.Delta.Translation.X);
+			translateTransform.Y = (translation.Y += e.Delta.Translation.Y);
 			transformGroup.Children.Append(translateTransform);
 
 			// Scale.
@@ -44,27 +51,10 @@ var transformOrigin = Point(.5, .5),
 
 			// Apply.
 			view.RenderTransform = transformGroup;
-		}
-	}
-]);
-
-canvas.Background = colors.blue;
-canvas.Width = window.Bounds.Width;
-canvas.Height = window.Bounds.Height;
-
-for (var i = 0; i < 3; i++) {
-	var handler = new ManipulationHandler(),
-	// TODO: We need to figure out how to protect handlers in memory, if necessary.
-		delta = deltas[i] = new ManipulationDeltaEventHandler(handler, 'ManipulationDelta'),
-		view = new Canvas();
-
-	view.Width = view.Height = (Math.random() * 200 + 100) | 0;
-	Canvas.SetTop(view, (Math.random() * (canvas.Height - view.Height)) | 0);
-	Canvas.SetLeft(view, (Math.random() * (canvas.Width - view.Width)) | 0);
-	view.ManipulationMode = ManipulationModes.All;
-	view.add_ManipulationDelta(delta);
-	view.Background = colors[['red', 'yellow', 'green'][i % 3]];
-	canvas.Children.Append(view);
+		});
+		view.Background = colors[['red', 'yellow', 'green'][i % 3]];
+		canvas.Children.Append(view);
+	})();
 }
 
 window.Content = canvas;

@@ -1,25 +1,10 @@
-var Tray = require('../controls/tray.hjs');
+var Tray = require('../controls/tray.hjs'),
+	Capture = require('./capture.hjs');
 
 /*
  Public API.
  */
 exports.show = show;
-
-/*
- Utility class.
- */
-@class('LaunchTapHandler', null, [], [
-	{
-		name: 'PointerPressed',
-		forHandler: 'TappedEventHandler',
-		returnType: 'void',
-		arguments: [
-			{ name: 'sender', type: 'Object^' },
-			{ name: 'e', type: 'TappedRoutedEventArgs^' }
-		],
-		action: require('./capture.hjs').show
-	}
-]);
 
 /*
  Implementation.
@@ -44,7 +29,7 @@ function show() {
 	container.Children.Append(new Tray([
 		{
 			text: 'Hyperloop Me!',
-			handler: new TappedEventHandler(new LaunchTapHandler(), 'PointerPressed')
+			handler: Capture.show
 		}
 	]));
 
