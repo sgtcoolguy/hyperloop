@@ -12,21 +12,22 @@ import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class TestAPI extends Activity
+public class <%- MainActivityName %> extends Activity
 {
 	static
 	{
 		System.loadLibrary("JavaScriptCore");
-		System.loadLibrary("TestAPI");
+		System.loadLibrary("<%- MainActivityName %>");
 	}
     
-	public native boolean doInit(AssetManager java_asset_manager);
+	public native long doInit(AssetManager java_asset_manager);
 	public native void doPause();
 	public native void doResume();
 	public native void doDestroy();
 	public native void playSound(int sound_id);
 	public native String evaluateScript(String script_file, AssetManager java_asset_manager);
 
+	private long hyperloopJSGlobalContextRef;
 	private EditText inputTextField;
 	
 	/** Called when the activity is first created. */
@@ -38,6 +39,7 @@ public class TestAPI extends Activity
 		// get EditText component
 		inputTextField = (EditText)findViewById(R.id.input_text);
 		// addKeyListener();
+		hyperloopJSGlobalContextRef = doInit(this.getAssets());
     }
 
 
@@ -86,7 +88,7 @@ public class TestAPI extends Activity
 				Log.i("TestAPI", "result: " + result_string);		
 
 				// display a floating message
-				Toast.makeText(TestAPI.this, result_string, Toast.LENGTH_LONG).show();
+				Toast.makeText(<%- MainActivityName %>.this, result_string, Toast.LENGTH_LONG).show();
 
 				TextView result_text_view = (TextView)this.findViewById(R.id.result_text);
 				result_text_view.setText(result_string);
@@ -114,13 +116,13 @@ public class TestAPI extends Activity
 						&& (key_code == key_event.KEYCODE_ENTER))
 					{
 						// display a floating message
-						Toast.makeText(TestAPI.this,
+						Toast.makeText(<%- MainActivityName %>.this,
 							inputTextField.getText(), Toast.LENGTH_LONG).show();
 
 						Log.i("TestAPI", "calling: " + inputTextField.getText());		
 						String result_string = evaluateScript(inputTextField.getText().toString());
 
-						TextView result_text_view = (TextView)TestAPI.this.findViewById(R.id.result_text);
+						TextView result_text_view = (TextView)<%- MainActivityName %>.this.findViewById(R.id.result_text);
 						result_text_view.setText(result_string);
 
 						return true;

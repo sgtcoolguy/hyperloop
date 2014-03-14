@@ -23,6 +23,8 @@
 #include <android/log.h>
 #include <JavaScriptCore/JSContextRef.h>
 #include <JavaScriptCore/JSStringRef.h>
+#include <assert.h>
+
 
 #define LOGD(...) ((void)__android_log_print(ANDROID_LOG_INFO,  "TestAPI", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR,  "TestAPI", __VA_ARGS__))
@@ -37,10 +39,12 @@
 
 static jobject s_proxyObject;
 static JavaVM* s_javaVm;
+extern JavaVM* jvm;
 
 jint JNI_OnLoad(JavaVM* java_vm, void* reserved)
 {
 	s_javaVm = java_vm;
+	jvm = java_vm;
 	return JNI_VERSION_1_6;
 }
 
@@ -170,9 +174,9 @@ static jstring jstringFromC(JNIEnv* jni_env, const char* original_c_string)
 }
 
 /* Returns a JSStringRef which must be released by you when done */
-static JSStringRef RunScriptAndReturnJSStringRef(JSStringRef js_script_string)
+static JSStringRef RunScriptAndReturnJSStringRef(JSGlobalContextRef js_context, JSStringRef js_script_string)
 {
-	JSGlobalContextRef js_context = JSGlobalContextCreate(NULL);
+//	JSGlobalContextRef js_context = JSGlobalContextCreate(NULL);
 //	JSStringRef js_script_string = JSStringCreateWithUTF8CString("2+2;");
     JSStringRef js_file_name = JSStringCreateWithUTF8CString("fakefile.js");
     JSValueRef js_exception = NULL;
@@ -223,9 +227,9 @@ static JSStringRef RunScriptAndReturnJSStringRef(JSStringRef js_script_string)
 	return js_return_string;
 }
 
-jboolean Java_org_webkit_javascriptcore_testapi_TestAPI_doInit(JNIEnv* env, jobject thiz, jobject java_asset_manager)
+jlong Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doInit(JNIEnv* env, jobject thiz, jobject java_asset_manager)
 {
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_doInit");
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doInit");
 
 	// I'm not sure if I need to
 	AAssetManager* ndk_asset_manager = AAssetManager_fromJava(env, java_asset_manager);
@@ -236,35 +240,81 @@ jboolean Java_org_webkit_javascriptcore_testapi_TestAPI_doInit(JNIEnv* env, jobj
 	 */
 	s_proxyObject = (*env)->NewGlobalRef(env, thiz);
 
+    JSGlobalContextRef global_context_ref = HyperloopCreateVM();
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doInit passed HyperloopCreateVM()");
 
-	return JNI_TRUE;
+
+
+	// For minor ease and efficiency, I'll compute the file sizes first for the buffer beforehand
+	// so I can use just one large buffer.
+	AAsset* asset_cth = AAssetManager_open(ndk_asset_manager, "testapi.js", AASSET_MODE_UNKNOWN);
+	if(NULL == asset_cth)
+	{
+		__android_log_print(ANDROID_LOG_ERROR, "Test262Helper_LoadTestHarnessScripts", "Failed to open testapi.js");
+	}
+	off_t file_size_cth = AAsset_getLength(asset_cth);
+	off_t total_file_size = 0;
+	total_file_size = total_file_size + file_size_cth;
+	size_t string_buffer_size = total_file_size + 1; // add space for null terminator
+	char* file_buffer = (char*)calloc(string_buffer_size, sizeof(char));
+	int bytes_read;
+
+	bytes_read = AAsset_read(asset_cth, file_buffer, total_file_size);
+	assert(bytes_read == total_file_size);
+	AAsset_close(asset_cth);
+
+		LOGD("file_buffer: %s\n", file_buffer);
+	
+	JSStringRef scriptstring_jsstringref = JSStringCreateWithUTF8CString(file_buffer);
+
+
+
+	
+
+	JSStringRef result_string = RunScriptAndReturnJSStringRef(global_context_ref, scriptstring_jsstringref);
+	
+		size_t bytes_needed = JSStringGetMaximumUTF8CStringSize(result_string);
+		LOGD("result bytes_needed: %d\n", bytes_needed);
+
+		char* c_result_string = (char*)calloc(bytes_needed, sizeof(char));
+		JSStringGetUTF8CString(result_string, c_result_string, bytes_needed);
+
+		LOGD("c_result_string: %s\n", c_result_string);
+		free(c_result_string);
+
+	
+	JSStringRelease(scriptstring_jsstringref);
+	JSStringRelease(result_string);
+
+
+	return (jlong)global_context_ref;
 }
 
-void Java_org_webkit_javascriptcore_testapi_TestAPI_doPause(JNIEnv* env, jobject thiz)
+void Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doPause(JNIEnv* env, jobject thiz)
 {
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_doPause");
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doPause");
 }
 
-void Java_org_webkit_javascriptcore_testapi_TestAPI_doResume(JNIEnv* env, jobject thiz)
+void Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doResume(JNIEnv* env, jobject thiz)
 {
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_doResume");
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doResume");
 }
 
-void Java_org_webkit_javascriptcore_testapi_TestAPI_doDestroy(JNIEnv* env, jobject thiz)
+void Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doDestroy(JNIEnv* env, jobject thiz)
 {
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_doDestroy");
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doDestroy");
 
 	/* Release the proxy object. */
 	(*env)->DeleteGlobalRef(env, s_proxyObject);
 	s_proxyObject = NULL;
 
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_doDestroy end");
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_doDestroy end");
 
 }
 
 //extern int main_test(const char* script_file, AAssetManager* ndk_asset_manager);
 
-jstring Java_org_webkit_javascriptcore_testapi_TestAPI_evaluateScript(JNIEnv* jni_env, jobject thiz, jstring jstring_script, jobject java_asset_manager)
+jstring Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_evaluateScript(JNIEnv* jni_env, jobject thiz, jstring jstring_script, jobject java_asset_manager)
 {
 	/*
 	AAssetManager* ndk_asset_manager = AAssetManager_fromJava(jni_env, java_asset_manager);
@@ -289,9 +339,9 @@ jstring Java_org_webkit_javascriptcore_testapi_TestAPI_evaluateScript(JNIEnv* jn
 }
 
 #if 1
-void Java_org_webkit_javascriptcore_testapi_TestAPI_playSound(JNIEnv* env, jobject thiz, jint sound_id)
+void Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_playSound(JNIEnv* env, jobject thiz, jint sound_id)
 {
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_playSound, sound_id:%d", sound_id);
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_playSound, sound_id:%d", sound_id);
 	int which_channel;
 	// For laziness, I just interpret integer ids to map to particular sounds.
 	switch(sound_id)
@@ -319,7 +369,7 @@ void Java_org_webkit_javascriptcore_testapi_TestAPI_playSound(JNIEnv* env, jobje
 	   {	
 		LOGD("Failed to play: %s", ALmixer_GetError());
 	}
-	LOGD("Java_org_webkit_javascriptcore_testapi_TestAPI_playSound ended, which_channel:%d", which_channel);
+	LOGD("Java_org_webkit_javascriptcore_testapi_<%- MainActivityName %>_playSound ended, which_channel:%d", which_channel);
 */	
 }
 #endif

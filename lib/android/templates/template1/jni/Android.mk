@@ -16,8 +16,17 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := TestAPI
-LOCAL_SRC_FILES := TestAPI_JNI.c testapi.c
+LOCAL_MODULE    := <%- MainActivityName %>
+#LOCAL_SRC_FILES := TestAPI_JNI.c testapi.c
+LOCAL_SRC_FILES := TestAPI_JNI.c \
+	HyperloopJNI.c \
+	HyperloopJNIExport.c \
+	JS_android_util_Log.c \
+	JS_java_lang_Object.c \
+	JS_java_lang_String.c \
+	JS_android_os_Bundle.c \
+	JS_android_app_Activity.c \
+	testapi.c
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../../API/ 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../../../../../WTF/
