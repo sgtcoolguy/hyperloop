@@ -1,0 +1,71 @@
+/*
+ Create a basic UI for showing the results of our code below.
+ */
+var win = Window.Current,
+	text = new TextBlock();
+text.Text = '';
+text.TextAlignment = TextAlignment.Center;
+text.VerticalAlignment = VerticalAlignment.Center;
+text.HorizontalAlignment = HorizontalAlignment.Center;
+text.FontSize = 20;
+win.Content = text;
+win.Activate();
+
+/**
+ * Log to the screen and to the console.
+ */
+function log() {
+	var args = Array.prototype.slice.call(arguments, 0);
+	text.Text += args.reduce(function(previous, current) {
+		return previous + ' ' + current.toString();
+	}) + '\n';
+	console.log.apply(console, arguments);
+}
+
+/*
+ Demonstrate modules.
+ */
+
+function assert(value, test, msg) {
+	log(
+		(value ? 'PASS' : 'FAIL') +
+			':  ' + test + ' ' +
+			(!value ? ('\t(received: ' + msg + ')') : '')
+	);
+}
+
+global.assert = assert;
+
+var mod = require('./mod'),					// local directory
+	bar = require('./bar/bar.js'),			// absolute with js file extension
+	barcat = require('./bar/cat'),			// module from folder with index.js
+	cat = require('./cat'),					// module from package.json
+	foo = require('./foo/bar'),				// multi-directory
+	mymodule = require('mymodule'),			// module from node_modules
+	nested = require('./nested'),			// nested with node_modules
+	foo2 = require('/foo/bar');				// absolute directory from top
+
+assert(foo.bar === 1, "foo.bar should be 1", foo.bar);
+assert(cat.name === 'shelby', "cat.name should be shelby", cat.name);
+
+try {
+	// test trying to load a bad module
+	require('badname');
+	assert(false, "should have raised an exception and it didn't", "");
+}
+catch (e) {
+	// check message to make sure it's correct
+	assert(e.message === "cannot find module 'badname'", "bad require raised exception", e.message);
+	assert(e.code === "MODULE_NOT_FOUND", "exception code property", e.code);
+}
+
+// test making sure modules are only ever loaded once
+nested.count++;
+nested = require('./nested');
+
+assert(nested.count === 2, 'nested count should be 2', nested.count);
+assert(global.foobar === 123, 'global.foobar should be 123', global.foobar);
+assert(false === module.loaded, 'module should not be loaded yet', module.loaded);
+assert(module.parent === null, 'module should not have a parent', module.parent);
+
+assert(__dirname === './', "__dirname should be './'", __dirname);

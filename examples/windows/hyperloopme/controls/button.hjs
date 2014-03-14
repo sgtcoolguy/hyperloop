@@ -1,0 +1,30 @@
+var White = new SolidColorBrush(Colors.White);
+
+/*
+ Public API.
+ */
+module.exports = _constructor;
+
+/*
+ Implementation.
+ */
+function _constructor(text, handler) {
+	var button = new Button(),
+		textBlock = new TextBlock();
+
+	button.Width = 300;
+	button.Height = 60;
+	button.Foreground = White;
+	button.VerticalAlignment = VerticalAlignment.Center;
+	button.HorizontalAlignment = HorizontalAlignment.Center;
+	button.add_Tapped(handler);
+
+	textBlock.Text = text;
+	textBlock.TextWrapping = TextWrapping.Wrap;
+	textBlock.TextAlignment = TextAlignment.Center;
+	textBlock.FontSize = 30;
+
+	button.Content = textBlock;
+
+	return button;
+}

@@ -1,0 +1,36 @@
+var Tray = require('../controls/tray.hjs'),
+	Launch = require('./launch.hjs');
+/*
+ Public API.
+ */
+exports.show = show;
+
+/*
+ Implementation.
+ */
+function show(bitmap) {
+	var window = Window.Current,
+		background = new ImageBrush(),
+		container = new Canvas();
+
+	background.ImageSource = bitmap;
+	container.Background = background;
+
+	var tray = global.lastTray = Tray([
+		{
+			text: 'Share',
+			handler: showShareUI
+		},
+		{
+			text: 'Continue',
+			handler: Launch.show
+		}
+	]);
+	container.Children.Append(tray);
+
+	window.Content = container;
+}
+
+function showShareUI() {
+	DataTransferManager.ShowShareUI();
+}

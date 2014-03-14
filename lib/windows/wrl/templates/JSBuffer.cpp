@@ -1,12 +1,4 @@
-/**
- * Copyright (c) 2013 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the Apache Public License
- * Please see the LICENSE included with this distribution for details.
- *
- * This generated code and related technologies are covered by patents
- * or patents pending by Appcelerator, Inc.
- */
-
+<%- renderTemplate('jsc/templates/doc.ejs') %>
 #include "JSBuffer.h"
 #include "nan.h"
 
@@ -323,7 +315,8 @@ JSValueRef putForJSBuffer (JSContextRef ctx, JSObjectRef function, JSObjectRef o
         return JSValueMakeUndefined(ctx);
     }
 
-	throw ref new Exception(0, "JSBuffer's putForJSBuffer has not been implemented on Windows yet.");
+	HyperloopRaiseNativeToJSException(ctx, exception, ref new Exception(-1, "JSBuffer's putForJSBuffer has not been implemented on Windows yet."), __FILE__, __FUNCTION__, __LINE__);
+	return JSValueMakeUndefined(ctx);
     /*void *src = &(srcBuffer->buffer[(int)srcIndex]);
     size_t newsize = (buffer->length - (int)destIndex);
     newsize = newsize + srcLength - newsize;
@@ -868,7 +861,8 @@ JSValueRef sliceForJSBuffer (JSContextRef ctx, JSObjectRef function, JSObjectRef
         return JSValueMakeUndefined(ctx);
     }
 
-	throw ref new Exception(0, "JSBuffer's sliceForJSBuffer has not been implemented on Windows yet.");
+	HyperloopRaiseNativeToJSException(ctx, exception, ref new Exception(-1, "JSBuffer's sliceForJSBuffer has not been implemented on Windows yet."), __FILE__, __FUNCTION__, __LINE__);
+	return JSValueMakeUndefined(ctx);
     /*void *memory = malloc(length);
     void *start = &(buffer->buffer[(int)index]);
     memcpy(memory,start,length);
@@ -1197,7 +1191,7 @@ void DestroyJSBuffer(JSBuffer *buffer)
  */
 void SetJSBufferValue(JSContextRef ctx, JSObjectRef objectRef, JSValueRef sourceRef)
 {
-	throw ref new Exception(0, "JSBuffer's SetJSBufferValue has not been implemented on Windows yet.");
+	throw ref new Exception(-1, "JSBuffer's SetJSBufferValue has not been implemented on Windows yet.");
     /*JSBuffer *buffer = (JSBuffer*)HyperloopGetPrivateObjectAsJSBuffer(objectRef);
     if (buffer!=nullptr)
     {

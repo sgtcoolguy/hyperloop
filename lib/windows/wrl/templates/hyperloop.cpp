@@ -1,7 +1,15 @@
+<%- renderTemplate('jsc/templates/doc.ejs') %>
 #include "hyperloop.h"
+#include "Logger.h"
 #include "nan.h"
+#include <collection.h>
+#include <algorithm>
 using namespace Platform;
 using namespace Platform::Details;
+using namespace Platform::Collections;
+using namespace Windows::Foundation;
+using namespace Windows::Foundation::Collections;
+using namespace Windows::UI::Xaml;
 
 std::wstring hyperloop::getWString(JSStringRef sValue) {
 	size_t sLength = JSStringGetMaximumUTF8CStringSize(sValue);
@@ -17,13 +25,12 @@ std::wstring hyperloop::getWString(JSContextRef ctx, JSValueRef ref) {
 	return hyperloop::getWString(sValue);
 }
 
+std::string hyperloop::getSStr(Platform::String^ string) {
+	return std::string(string->Begin(), string->End());
+}
+
 const char* hyperloop::getCStr(Platform::String^ string) {
-	std::wstring w_str(string->Begin());
-	std::string s_str(w_str.begin(), w_str.end());
-	int length = sizeof(w_str);
-	char *c_str = new char[length];
-	strcpy_s(c_str, length, s_str.c_str());
-	return c_str;
+	return std::string(string->Begin(), string->End()).c_str();
 }
 
 const char* hyperloop::getCStr(JSContextRef ctx, JSValueRef ref) {
@@ -34,6 +41,12 @@ const char* hyperloop::getCStr(JSContextRef ctx, JSValueRef ref) {
 	char *c_str = new char[length];
 	strcpy_s(c_str, length, s_str.c_str());
 	return c_str;
+}
+
+String^ hyperloop::getPlatformString(std::string s_str) {
+	std::wstring b(s_str.begin(), s_str.end());
+	const wchar_t *wcString = b.c_str();
+	return ref new String(wcString);
 }
 
 String^ hyperloop::getPlatformString(JSStringRef sValue) {
@@ -76,6 +89,10 @@ JSValueRef hyperloop::getJSValueRef(JSContextRef ctx, Platform::String^ string) 
 	return retVal;
 }
 
+void hyperloop::log(String ^string) {
+	Logger::log(string);
+}
+
 JSValueRef HyperloopundefinedToJSValueRef(JSContextRef ctx, Object^ o) {
 	return JSValueMakeUndefined(ctx);
 }
@@ -90,16 +107,62 @@ int HyperloopGetLength(JSContextRef ctx, JSObjectRef objRef, JSValueRef *excepti
 	return (int)JSValueToNumber(ctx, length, exception);
 }
 
+
+/**
+ * function will properly convert a native exception into a JS Error and throw it back
+ * into the JSContext by setting the Error in the exception passed
+ */
+void HyperloopRaiseNativeToJSException(JSContextRef ctx, JSValueRef *exception, Exception ^ex, const char *file, const char *fnName, int lineNumber)
+{
+	JSValueRef exargs[1];
+	JSStringRef exstr = hyperloop::getJSStringRef(ex->Message);
+	exargs[0] = JSValueMakeString(ctx, exstr);
+
+	// make the js Error object
+	JSObjectRef exobj = JSObjectMakeError(ctx, 1, exargs, 0);
+
+	// set the native source filename
+	{
+		JSStringRef prop = JSStringCreateWithUTF8CString("nativeSource");
+		JSStringRef valueStr = JSStringCreateWithUTF8CString(file);
+		JSValueRef value = JSValueMakeString(ctx, valueStr);
+		JSObjectSetProperty(ctx, exobj, prop, value, kJSPropertyAttributeNone, 0);
+		JSStringRelease(prop);
+		JSStringRelease(valueStr);
+	}
+	// set the native source function
+	{
+		JSStringRef prop = JSStringCreateWithUTF8CString("nativeFunction");
+		JSStringRef valueStr = JSStringCreateWithUTF8CString(fnName);
+		JSValueRef value = JSValueMakeString(ctx, valueStr);
+		JSObjectSetProperty(ctx, exobj, prop, value, kJSPropertyAttributeNone, 0);
+		JSStringRelease(prop);
+		JSStringRelease(valueStr);
+	}
+	// set the native line number
+	{
+		JSStringRef prop = JSStringCreateWithUTF8CString("nativeLine");
+		JSValueRef value = JSValueMakeNumber(ctx, lineNumber);
+		JSObjectSetProperty(ctx, exobj, prop, value, kJSPropertyAttributeNone, 0);
+		JSStringRelease(prop);
+	}
+
+	JSStringRelease(exstr);
+
+	// set our exception object
+	*exception = exobj;
+}
+
 /**
  * create a JSPrivateObject for storage in a JSObjectRef
  */
 JSPrivateObject* HyperloopMakePrivateObjectForID(JSContextRef ctx, Object^ object)
 {
-    JSPrivateObject *p = new JSPrivateObject();
-    p->object = object;
-    p->value = NAN;
-    p->type = JSPrivateObjectTypeID;
-    p->context = ctx;
+	JSPrivateObject *p = new JSPrivateObject();
+	p->object = object;
+	p->value = NAN;
+	p->type = JSPrivateObjectTypeID;
+	p->context = ctx;
 	return p;
 }
 
@@ -108,11 +171,11 @@ JSPrivateObject* HyperloopMakePrivateObjectForID(JSContextRef ctx, Object^ objec
  */
 JSPrivateObject* HyperloopMakePrivateObjectForPointer(void *pointer)
 {
-    JSPrivateObject *p = new JSPrivateObject();
-    p->buffer = pointer;
-    p->type = JSPrivateObjectTypePointer;
-    p->value = std::numeric_limits<double>::quiet_NaN();
-    return p;
+	JSPrivateObject *p = new JSPrivateObject();
+	p->buffer = pointer;
+	p->type = JSPrivateObjectTypePointer;
+	p->value = std::numeric_limits<double>::quiet_NaN();
+	return p;
 }
 
 /**
@@ -120,10 +183,10 @@ JSPrivateObject* HyperloopMakePrivateObjectForPointer(void *pointer)
  */
 JSPrivateObject* HyperloopMakePrivateObjectForNumber(double value)
 {
-    JSPrivateObject *p = new JSPrivateObject();
-    p->value = value;
-    p->type = JSPrivateObjectTypeNumber;
-    return p;
+	JSPrivateObject *p = new JSPrivateObject();
+	p->value = value;
+	p->type = JSPrivateObjectTypeNumber;
+	return p;
 }
 
 /**
@@ -134,7 +197,7 @@ void HyperloopDestroyPrivateObject(JSObjectRef object)
 	JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
 	if (p!=nullptr)
 	{
-        JSObjectSetPrivate(object,0);
+		JSObjectSetPrivate(object,0);
 	}
 }
 
@@ -143,17 +206,17 @@ void HyperloopDestroyPrivateObject(JSObjectRef object)
  */
 Object^ HyperloopGetPrivateObjectAsID(JSObjectRef object)
 {
-    if (object!=nullptr)
-    {
-        JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
-        if (p!=nullptr)
-        {
-            if (p->type == JSPrivateObjectTypeID)
-            {
-                return p->object;
-            }
-        }
-    }
+	if (object!=nullptr)
+	{
+		JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
+		if (p!=nullptr)
+		{
+			if (p->type == JSPrivateObjectTypeID)
+			{
+				return p->object;
+			}
+		}
+	}
 	return nullptr;
 }
 
@@ -162,18 +225,18 @@ Object^ HyperloopGetPrivateObjectAsID(JSObjectRef object)
  */
 void* HyperloopGetPrivateObjectAsPointer(JSObjectRef object)
 {
-    if (object!=nullptr)
-    {
-        JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
-        if (p!=nullptr)
-        {
-            if (p->type == JSPrivateObjectTypePointer)
-            {
-                return p->buffer;
-            }
-        }
-    }
-    return nullptr;
+	if (object!=nullptr)
+	{
+		JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
+		if (p!=nullptr)
+		{
+			if (p->type == JSPrivateObjectTypePointer)
+			{
+				return p->buffer;
+			}
+		}
+	}
+	return nullptr;
 }
 
 /**
@@ -181,18 +244,18 @@ void* HyperloopGetPrivateObjectAsPointer(JSObjectRef object)
  */
 double HyperloopGetPrivateObjectAsNumber(JSObjectRef object)
 {
-    if (object!=nullptr)
-    {
-        JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
-        if (p!=nullptr)
-        {
-            if (p->type == JSPrivateObjectTypeNumber)
-            {
-                return p->value;
-            }
-        }
-    }
-    return NAN;
+	if (object!=nullptr)
+	{
+		JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
+		if (p!=nullptr)
+		{
+			if (p->type == JSPrivateObjectTypeNumber)
+			{
+				return p->value;
+			}
+		}
+	}
+	return NAN;
 }
 
 
@@ -201,14 +264,14 @@ double HyperloopGetPrivateObjectAsNumber(JSObjectRef object)
  */
 bool HyperloopPrivateObjectIsType(JSObjectRef object, JSPrivateObjectType type)
 {
-    if (object!=nullptr)
-    {
-        JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
-        if (p!=nullptr)
-        {
-            return p->type == type;
-        }
-    }
+	if (object!=nullptr)
+	{
+		JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
+		if (p!=nullptr)
+		{
+			return p->type == type;
+		}
+	}
 	return false;
 }
 
@@ -217,13 +280,13 @@ bool HyperloopPrivateObjectIsType(JSObjectRef object, JSPrivateObjectType type)
  */
 JSValueRef HyperloopMakeException(JSContextRef ctx, const char *error, JSValueRef *exception)
 {
-    if (exception!=nullptr)
-    {
-        JSStringRef string = JSStringCreateWithUTF8CString(error);
-        JSValueRef message = JSValueMakeString(ctx, string);
-        JSStringRelease(string);
-        *exception = JSObjectMakeError(ctx, 1, &message, 0);
-    }
+	if (exception!=nullptr)
+	{
+		JSStringRef string = JSStringCreateWithUTF8CString(error);
+		JSValueRef message = JSValueMakeString(ctx, string);
+		JSStringRelease(string);
+		*exception = JSObjectMakeError(ctx, 1, &message, 0);
+	}
 	return JSValueMakeUndefined(ctx);
 }
 
@@ -270,56 +333,220 @@ JSValueRef HyperloopLogger (JSContextRef ctx, JSObjectRef function, JSObjectRef 
 			out += " " + HyperloopToString(ctx, arguments[c]);
 		}
 	}
-	out += "\n";
-	std::wstring w_str(out->Begin());
-	OutputDebugString(w_str.c_str());
+	hyperloop::log(out);
 
+	return JSValueMakeUndefined(ctx);
+}
+
+JSValueRef HyperloopAlerter (JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
+{
+	if (argumentCount <= 0) {
+		return JSValueMakeUndefined(ctx);
+	}
+	auto title = argumentCount == 1 ? "Alert" : HyperloopToString(ctx, arguments[0]);
+	auto message = HyperloopToString(ctx, arguments[argumentCount == 1 ? 0 : 1]);
+	try {
+		(ref new Windows::UI::Popups::MessageDialog(message, title))->ShowAsync();
+	}
+	catch (Exception ^ex) {
+		HyperloopRaiseNativeToJSException(ctx, exception, ex, __FILE__, __FUNCTION__, __LINE__);
+	}
+	return JSValueMakeUndefined(ctx);
+}
+
+/*
+ Timeout and Interval Implementation.
+*/
+
+private class TimerState {
+public:
+	bool isInterval;
+	int id;
+	JSGlobalContextRef gctx;
+	JSObjectRef thisObject;
+	JSObjectRef callback;
+};
+
+static int timerCount;
+static auto timers = ref new Map<int, DispatcherTimer ^>();
+static auto timerStates = new std::map<int, TimerState *>();
+
+private ref class TimerDoneCallback sealed {
+private:
+	int id;
+public:
+	TimerDoneCallback(int id) {
+		this->id = id;
+	};
+	void EventCallback(Object^ sender, Object^ e);
+};
+
+static auto timerHandlers = ref new Map<int, TimerDoneCallback ^>();
+
+void TimerDoneCallback::EventCallback(Object^ sender, Object^ e) {
+	if (!timers->HasKey(id)) {
+		return;
+	}
+	auto state = timerStates->at(id);
+	JSValueRef exception = NULL;
+	JSValueProtect(state->gctx, state->thisObject);
+	JSValueProtect(state->gctx, state->callback);
+	JSObjectCallAsFunction(state->gctx, state->callback, state->thisObject, 0, 0, &exception);
+	JSValueUnprotect(state->gctx, state->thisObject);
+	JSValueUnprotect(state->gctx, state->callback);
+	if (!timers->HasKey(id)) {
+		return;
+	}
+	CHECK_EXCEPTION(state->gctx, exception);
+	if (!state->isInterval) {
+		timers->Lookup(id)->Stop();
+		JSValueUnprotect(state->gctx, state->thisObject);
+		JSValueUnprotect(state->gctx, state->callback);
+		timers->Remove(id);
+		timerStates->erase(id);
+		timerHandlers->Remove(id);
+	}
+}
+
+JSValueRef HyperloopSetTimeoutOrInterval(bool isInterval, JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
+	if (argumentCount <= 0) {
+		return JSValueMakeUndefined(ctx);
+	}
+	auto id = timerCount++;
+	auto gctx = HyperloopGetGlobalContext(ctx);
+	auto callback = JSValueToObject(ctx, arguments[0], exception);
+	auto timerDone = ref new TimerDoneCallback(id);
+	auto handler = ref new Windows::Foundation::EventHandler<Object^>(timerDone, &TimerDoneCallback::EventCallback);
+
+	auto timerState = new TimerState();
+	timerState->isInterval = isInterval;
+	timerState->id = id;
+	timerState->gctx = gctx;
+	timerState->thisObject = thisObject;
+	timerState->callback = callback;
+	timerStates->insert(std::make_pair(id, timerState));
+
+	JSValueProtect(gctx, callback);
+	JSValueProtect(gctx, thisObject);
+	timerHandlers->Insert(id, timerDone);
+	TimeSpan timeout;
+	timeout.Duration = (argumentCount == 1 ? 0 : JSValueToNumber(ctx, arguments[1], exception)) * 10000;
+	auto timer = ref new DispatcherTimer();
+	timer->Tick += handler;
+	timer->Interval = timeout;
+	timer->Start();
+	timers->Insert(id, timer);
+	return JSValueMakeNumber(ctx, id);
+}
+
+JSValueRef HyperloopSetTimeout(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
+{
+	return HyperloopSetTimeoutOrInterval(false, ctx, function, thisObject, argumentCount, arguments, exception);
+}
+
+JSValueRef HyperloopSetInterval(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
+{
+	return HyperloopSetTimeoutOrInterval(true, ctx, function, thisObject, argumentCount, arguments, exception);
+}
+
+JSValueRef HyperloopClearIntervalOrTimeout(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
+{
+	if (argumentCount <= 0) {
+		return JSValueMakeUndefined(ctx);
+	}
+	auto id = JSValueToNumber(ctx, arguments[0], exception);
+	if (id > timerCount || !timers->HasKey(id)) {
+		return JSValueMakeUndefined(ctx);
+	}
+	auto timer = timers->Lookup(id);
+	if (timer->IsEnabled) {
+		timer->Stop();
+	}
+	auto state = timerStates->at(id);
+	JSValueUnprotect(state->gctx, state->thisObject);
+	JSValueUnprotect(state->gctx, state->callback);
+	timers->Remove(id);
+	timerStates->erase(id);
+	timerHandlers->Remove(id);
 	return JSValueMakeUndefined(ctx);
 }
 
 /**
  * create a hyperloop VM
  */
- 
-JSGlobalContextRef HyperloopCreateVM ()
+
+JSGlobalContextRef HyperloopCreateVM(JSGlobalContextRef globalContextRef, JSObjectRef globalObjectRef, String ^name, String ^prefix)
 {
-    JSGlobalContextRef globalContextRef = JSGlobalContextCreate(nullptr);
-    JSObjectRef globalObjectref = JSContextGetGlobalObject(globalContextRef);
+	// inject...
+	// ... console.log.
+	auto consoleObject = JSObjectMake(globalContextRef, 0, 0);
+	auto logProperty = JSStringCreateWithUTF8CString("log");
+	auto consoleProperty = JSStringCreateWithUTF8CString("console");
+	auto logFunction = JSObjectMakeFunctionWithCallback(globalContextRef, logProperty, HyperloopLogger);
+	JSObjectSetProperty(globalContextRef, consoleObject, logProperty, logFunction, kJSPropertyAttributeNone, 0);
+	JSObjectSetProperty(globalContextRef, globalObjectRef, consoleProperty, consoleObject, kJSPropertyAttributeNone, 0);
+	JSStringRelease(logProperty);
+	JSStringRelease(consoleProperty);
 
-    // inject a simple console logger
-    JSObjectRef consoleObject = JSObjectMake(globalContextRef, 0, 0);
-    JSStringRef logProperty = JSStringCreateWithUTF8CString("log");
-    JSStringRef consoleProperty = JSStringCreateWithUTF8CString("console");
-    JSObjectRef logFunction = JSObjectMakeFunctionWithCallback(globalContextRef, logProperty, HyperloopLogger);
-    JSObjectSetProperty(globalContextRef, consoleObject, logProperty, logFunction, kJSPropertyAttributeNone, 0);
-    JSObjectSetProperty(globalContextRef, globalObjectref, consoleProperty, consoleObject, kJSPropertyAttributeNone, 0);
-    JSStringRelease(logProperty);
-    JSStringRelease(consoleProperty);
+	// ... alert.
+	auto alertObject = JSObjectMake(globalContextRef, 0, 0);
+	auto alertProperty = JSStringCreateWithUTF8CString("alert");
+	auto alertFunction = JSObjectMakeFunctionWithCallback(globalContextRef, alertProperty, HyperloopAlerter);
+	JSObjectSetProperty(globalContextRef, globalObjectRef, alertProperty, alertFunction, kJSPropertyAttributeNone, 0);
+	JSStringRelease(alertProperty);
 
-    // create a hook into our global context
-    JSClassDefinition def = kJSClassDefinitionEmpty;
-    JSClassRef classDef = JSClassCreate(&def);
-    JSObjectRef wrapper = JSObjectMake(globalContextRef, classDef, globalContextRef);
-    JSStringRef prop = JSStringCreateWithUTF8CString("hyperloop$global");
-    JSObjectSetProperty(globalContextRef, globalObjectref, prop, wrapper, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontEnum | kJSPropertyAttributeDontDelete, 0);
-    JSStringRelease(prop);
+	// ... setTimeout.
+	auto setTimeoutObject = JSObjectMake(globalContextRef, 0, 0);
+	auto setTimeoutProperty = JSStringCreateWithUTF8CString("setTimeout");
+	auto setTimeoutFunction = JSObjectMakeFunctionWithCallback(globalContextRef, setTimeoutProperty, HyperloopSetTimeout);
+	JSObjectSetProperty(globalContextRef, globalObjectRef, setTimeoutProperty, setTimeoutFunction, kJSPropertyAttributeNone, 0);
+	JSStringRelease(setTimeoutProperty);
 
-    // setup our globals object
-    JSStringRef globalProperty = JSStringCreateWithUTF8CString("globals");
-    JSObjectSetProperty(globalContextRef, globalObjectref, globalProperty, globalObjectref, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, 0);
-    JSStringRelease(globalProperty);
+	// ... setInterval.
+	auto setIntervalObject = JSObjectMake(globalContextRef, 0, 0);
+	auto setIntervalProperty = JSStringCreateWithUTF8CString("setInterval");
+	auto setIntervalFunction = JSObjectMakeFunctionWithCallback(globalContextRef, setIntervalProperty, HyperloopSetInterval);
+	JSObjectSetProperty(globalContextRef, globalObjectRef, setIntervalProperty, setIntervalFunction, kJSPropertyAttributeNone, 0);
+	JSStringRelease(setIntervalProperty);
 
-    // retain it
-    JSGlobalContextRetain(globalContextRef);
+	// ... clearTimeout.
+	auto clearTimeoutObject = JSObjectMake(globalContextRef, 0, 0);
+	auto clearTimeoutProperty = JSStringCreateWithUTF8CString("clearTimeout");
+	auto clearTimeoutFunction = JSObjectMakeFunctionWithCallback(globalContextRef, clearTimeoutProperty, HyperloopClearIntervalOrTimeout);
+	JSObjectSetProperty(globalContextRef, globalObjectRef, clearTimeoutProperty, clearTimeoutFunction, kJSPropertyAttributeNone, 0);
+	JSStringRelease(clearTimeoutProperty);
 
-    // load the app into the context
-    //HyperloopJS *module = HyperloopLoadJS(globalContextRef,nullptr,name,prefix);
-    //if (module==nullptr)
-    //{
-     //   return nullptr;
-    //}
+	// ... clearInterval.
+	auto clearIntervalObject = JSObjectMake(globalContextRef, 0, 0);
+	auto clearIntervalProperty = JSStringCreateWithUTF8CString("clearInterval");
+	auto clearIntervalFunction = JSObjectMakeFunctionWithCallback(globalContextRef, clearIntervalProperty, HyperloopClearIntervalOrTimeout);
+	JSObjectSetProperty(globalContextRef, globalObjectRef, clearIntervalProperty, clearIntervalFunction, kJSPropertyAttributeNone, 0);
+	JSStringRelease(clearIntervalProperty);
 
-    return globalContextRef;
+	// create a hook into our global context
+	auto def = kJSClassDefinitionEmpty;
+	auto classDef = JSClassCreate(&def);
+	auto wrapper = JSObjectMake(globalContextRef, classDef, globalContextRef);
+	auto prop = JSStringCreateWithUTF8CString("hyperloop$global");
+	JSObjectSetProperty(globalContextRef, globalObjectRef, prop, wrapper, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontEnum | kJSPropertyAttributeDontDelete, 0);
+	JSStringRelease(prop);
+
+	// setup our globals object
+	auto globalProperty = JSStringCreateWithUTF8CString("global");
+	JSObjectSetProperty(globalContextRef, globalObjectRef, globalProperty, globalObjectRef, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontDelete, 0);
+	JSStringRelease(globalProperty);
+
+	// retain it
+	JSGlobalContextRetain(globalContextRef);
+
+	// load the app into the context
+	auto module = HyperloopLoadJS(globalContextRef, nullptr, hyperloop::getSStr(name), hyperloop::getSStr(prefix));
+	if (module == nullptr)
+	{
+		return nullptr;
+	}
+
+	return globalContextRef;
 }
 
 /**
@@ -327,16 +554,16 @@ JSGlobalContextRef HyperloopCreateVM ()
  */
 JSGlobalContextRef HyperloopGetGlobalContext (JSContextRef ctx)
 {
-    JSObjectRef global = JSContextGetGlobalObject(ctx);
-    JSStringRef prop = JSStringCreateWithUTF8CString("hyperloop$global");
-    JSValueRef value = JSObjectGetProperty(ctx, global, prop, nullptr);
-    JSStringRelease(prop);
-    if (JSValueIsObject(ctx,value))
-    {
-        JSObjectRef obj = JSValueToObject(ctx,value,0);
-        return (JSGlobalContextRef)JSObjectGetPrivate(obj);
-    }
-    return nullptr;
+	JSObjectRef global = JSContextGetGlobalObject(ctx);
+	JSStringRef prop = JSStringCreateWithUTF8CString("hyperloop$global");
+	JSValueRef value = JSObjectGetProperty(ctx, global, prop, nullptr);
+	JSStringRelease(prop);
+	if (JSValueIsObject(ctx,value))
+	{
+		JSObjectRef obj = JSValueToObject(ctx,value,0);
+		return (JSGlobalContextRef)JSObjectGetPrivate(obj);
+	}
+	return nullptr;
 }
 
 /**
@@ -344,17 +571,17 @@ JSGlobalContextRef HyperloopGetGlobalContext (JSContextRef ctx)
  */
 void HyperloopDestroyVM (JSGlobalContextRef ctx)
 {
-    JSGlobalContextRef globalCtx = HyperloopGetGlobalContext(ctx);
-    if (globalCtx!=nullptr)
-    {
-        JSObjectRef global = JSContextGetGlobalObject(ctx);
-        JSStringRef prop = JSStringCreateWithUTF8CString("hyperloop$global");
-        JSValueRef value = JSObjectGetProperty(ctx, global, prop, nullptr);
-        JSObjectRef obj = JSValueToObject(ctx,value,0);
-        JSStringRelease(prop);
-        JSObjectSetPrivate(obj,nullptr);
-        JSGlobalContextRelease(globalCtx);
-    }
+	JSGlobalContextRef globalCtx = HyperloopGetGlobalContext(ctx);
+	if (globalCtx!=nullptr)
+	{
+		JSObjectRef global = JSContextGetGlobalObject(ctx);
+		JSStringRef prop = JSStringCreateWithUTF8CString("hyperloop$global");
+		JSValueRef value = JSObjectGetProperty(ctx, global, prop, nullptr);
+		JSObjectRef obj = JSValueToObject(ctx,value,0);
+		JSStringRelease(prop);
+		JSObjectSetPrivate(obj,nullptr);
+		JSGlobalContextRelease(globalCtx);
+	}
 }
 
 /**
@@ -367,19 +594,19 @@ void *HyperloopJSValueRefTovoid(JSContextRef ctx, JSValueRef value, JSValueRef *
 	if (JSValueIsObject(ctx, value)) {
 		JSObjectRef object = JSValueToObject(ctx, value, exception);
 		JSPrivateObject *p = reinterpret_cast<JSPrivateObject*>(JSObjectGetPrivate(object));
-        if (p != nullptr)
-        {
-            if (p->type == JSPrivateObjectTypeID)
-            {
-                return reinterpret_cast<void *>(p->object);
-            }
+		if (p != nullptr)
+		{
+			if (p->type == JSPrivateObjectTypeID)
+			{
+				return reinterpret_cast<void *>(p->object);
+			}
 			else
-            {
-                return p->buffer;
-            }
-        }
+			{
+				return p->buffer;
+			}
+		}
 	}
-    return nullptr;
+	return nullptr;
 }
 
 JSValueRef HyperloopboolToJSValueRef(JSContextRef ctx, bool boolean) {
@@ -387,205 +614,47 @@ JSValueRef HyperloopboolToJSValueRef(JSContextRef ctx, bool boolean) {
 }
 bool HyperloopJSValueRefTobool(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup) {
 	if (JSValueIsBoolean(ctx, value)) {
-        return JSValueToBoolean(ctx, value);
+		return JSValueToBoolean(ctx, value);
 	}
-    return false;
+	return false;
 }
 
 <% [ 'float64', 'float32', 'float',
-		'double',
+		'double', 'char', 'unsigned char',
 		'int64', 'int32', 'int16', 'int8', 'int',
 		'uint8', 'uint16', 'uint32', 'uint64'
 	]
 	.forEach(function(type) { %>
-JSValueRef Hyperloop<%- type %>ToJSValueRef(JSContextRef ctx, <%- type %> val) {
+JSValueRef Hyperloop<%- type.replace(/ /g,'') %>ToJSValueRef(JSContextRef ctx, <%- type %> val) {
 	return JSValueMakeNumber(ctx, (double)val);
 }
-<%- type %> HyperloopJSValueRefTo<%- type %>(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup) {
+<%- type %> HyperloopJSValueRefTo<%- type.replace(/ /g,'') %>(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup) {
 	if (JSValueIsNumber(ctx, value)) {
-        return (<%- type %>)JSValueToNumber(ctx, value, exception);
+		return (<%- type %>)JSValueToNumber(ctx, value, exception);
 	}
-    return 0;
+	return 0;
 }
-JSValueRef Hyperloop<%- type %>ArrayToJSValueRef(JSContextRef ctx, <%- type %>* val, int length) {
-	throw ref new Exception(0, "Hyperloop<%- type %>ArrayToJSValueRef has not been implemented yet!");
+JSValueRef Hyperloop<%- type.replace(/ /g,'') %>ArrayToJSValueRef(JSContextRef ctx, <%- type %>* val, int length) {
+	throw ref new Exception(-1, "Hyperloop<%- type %>ArrayToJSValueRef has not been implemented yet!");
 }
-<%- type %>* HyperloopJSValueRefTo<%- type %>Array(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup) {
+<%- type %>* HyperloopJSValueRefTo<%- type.replace(/ /g,'') %>Array(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup) {
 	if (JSValueIsObject(ctx, value)) {
 		JSObjectRef objRef = JSValueToObject(ctx, value, exception);
 		int length = HyperloopGetLength(ctx, objRef, exception);
 		auto result = new <%- type %>[length];
 		for (int i = 0; i < length; i++) {
 			JSValueRef val = JSObjectGetPropertyAtIndex(ctx, objRef, i, exception);
-			result[i] = HyperloopJSValueRefTo<%- type %>(ctx, val, exception, 0);
+			result[i] = HyperloopJSValueRefTo<%- type.replace(/ /g,'') %>(ctx, val, exception, 0);
 		}
-        return result;
+		return result;
 	}
-    return 0;
+	return 0;
 }
 <% }) %>
 
-JSClassDefinition ClassDefinitionForObject;
-JSClassDefinition ClassDefinitionForObjectConstructor;
-JSClassRef ObjectClassDef;
-JSClassRef ObjectClassDefForConstructor;
 JSValueRef HyperloopStringToJSValueRef(JSContextRef ctx, String^ val) {
 	return hyperloop::getJSValueRef(ctx, val);
 }
 String^ HyperloopJSValueRefToString(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup) {
 	return hyperloop::getPlatformString(ctx, value);
-}
-JSObjectRef MakeObjectForObject(JSContextRef ctx, Object^ instance)
-{
-	JSPrivateObject* poc = new JSPrivateObject();
-	poc->object = instance;
-	poc->type = JSPrivateObjectTypeID;
-	JSObjectRef object = JSObjectMake(ctx, CreateClassForObject(), poc);
-	JSObjectRef value = JSObjectMake(ctx, CreateClassForObjectConstructor(), 0);
-
-	JSStringRef cproperty = JSStringCreateWithUTF8CString("constructor");
-	JSObjectSetProperty(ctx, object, cproperty, value, kJSPropertyAttributeDontEnum, 0);
-	JSStringRelease(cproperty);
-
-	JSStringRef nameProperty = JSStringCreateWithUTF8CString("name");
-	JSStringRef valueProperty = JSStringCreateWithUTF8CString("Object");
-	JSValueRef valueRef = JSValueMakeString(ctx, valueProperty);
-	JSObjectSetProperty(ctx, value, nameProperty, valueRef, kJSPropertyAttributeDontEnum, 0);
-	JSStringRelease(nameProperty);
-	JSStringRelease(valueProperty);
-
-	return object;
-}
-JSValueRef HyperloopObjectToJSValueRef(JSContextRef ctx, Object^ instance)
-{
-	return MakeObjectForObject(ctx, instance);
-}
-Object^ HyperloopJSValueRefToObject(JSContextRef ctx, JSValueRef instance)
-{
-	JSObjectRef object = JSValueToObject(ctx, instance, 0);
-	return HyperloopGetPrivateObjectAsID(object);
-}
-Object^ HyperloopJSValueRefToobject(JSContextRef ctx, JSValueRef value, JSValueRef *exception, bool *cleanup)
-{
-	if (JSValueIsObject(ctx, value))
-	{
-		JSObjectRef object = JSValueToObject(ctx, value, exception);
-		return HyperloopGetPrivateObjectAsID(object);
-	}
-	if (JSValueIsString(ctx, value) || JSValueIsBoolean(ctx, value) || JSValueIsNumber(ctx, value))
-	{
-		return hyperloop::getPlatformString(ctx, value);
-	}
-	return nullptr;
-}
-void InitializerForObject (JSContextRef ctx, JSObjectRef object)
-{
-	JSPrivateObject *po = (JSPrivateObject *)JSObjectGetPrivate(object);
-}
-void FinalizerForObject (JSObjectRef object)
-{
-	HyperloopDestroyPrivateObject(object);
-}
-JSValueRef toStringForObject (JSContextRef ctx, JSObjectRef function, JSObjectRef object, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
-{
-	String^ obj = "Object";
-	return hyperloop::getJSValueRef(ctx, obj);
-}
-JSValueRef JSTypeConvertorForObject(JSContextRef ctx, JSObjectRef object, JSType type, JSValueRef* exception)
-{
-	Object^ obj = (Object^)HyperloopGetPrivateObjectAsID(object);
-	if (type == kJSTypeString)
-	{
-		return toStringForObject(ctx,NULL,object,0,NULL,exception);
-	}
-	return NULL;
-}
-bool IsInstanceForObject (JSContextRef ctx, JSObjectRef constructor, JSValueRef possibleInstance, JSValueRef* exception)
-{
-	return false;
-}
-static JSStaticValue StaticValueArrayForObject [] = {
-	{ 0, 0, 0, 0 }
-};
-
-static JSStaticFunction StaticFunctionArrayForObject [] = {
-	{ "toString", toStringForObject, kJSPropertyAttributeReadOnly | kJSPropertyAttributeDontEnum | kJSPropertyAttributeDontDelete },
-	{ 0, 0, 0 }
-};
-JSClassRef CreateClassForObject ()
-{
-	static bool init;
-	if (!init)
-	{
-		init = true;
-
-		ClassDefinitionForObject = kJSClassDefinitionEmpty;
-		ClassDefinitionForObject.staticValues = StaticValueArrayForObject;
-		ClassDefinitionForObject.staticFunctions = StaticFunctionArrayForObject;
-		ClassDefinitionForObject.initialize = InitializerForObject;
-		ClassDefinitionForObject.finalize = FinalizerForObject;
-		ClassDefinitionForObject.convertToType = JSTypeConvertorForObject;
-		ClassDefinitionForObject.className = "Object";
-		ClassDefinitionForObject.hasInstance = IsInstanceForObject;
-
-		ObjectClassDef = JSClassCreate(&ClassDefinitionForObject);
-
-		JSClassRetain(ObjectClassDef);
-	}
-	return ObjectClassDef;
-}
-JSObjectRef ObjectMakeInstance (JSContextRef ctx, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
-{
-	throw ref new Exception(0, "Object constructor has not been exposed via hyperloop yet!");
-}
-JSObjectRef MakeInstanceForObject (JSContextRef ctx, JSObjectRef constructor, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
-{
-	return ObjectMakeInstance(ctx,argumentCount,arguments,exception);
-}
-JSValueRef MakeInstanceFromFunctionForObject (JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
-{
-	return ObjectMakeInstance(ctx,argumentCount,arguments,exception);
-}
-static JSStaticFunction StaticFunctionArrayForObjectConstructor [] = {
-	{ 0, 0, 0 }
-};
-JSClassRef CreateClassForObjectConstructor ()
-{
-	static bool init;
-	if (!init)
-	{
-		init = true;
-
-		ClassDefinitionForObjectConstructor = kJSClassDefinitionEmpty;
-		ClassDefinitionForObjectConstructor.className = "ObjectConstructor";
-		ClassDefinitionForObjectConstructor.callAsConstructor = MakeInstanceForObject;
-		ClassDefinitionForObjectConstructor.callAsFunction = MakeInstanceFromFunctionForObject;
-		ClassDefinitionForObjectConstructor.staticFunctions = StaticFunctionArrayForObjectConstructor;
-
-		ObjectClassDefForConstructor = JSClassCreate(&ClassDefinitionForObjectConstructor);
-
-		JSClassRetain(ObjectClassDefForConstructor);
-	}
-	return ObjectClassDefForConstructor;
-}
-
-JSValueRef HyperloopobjectToJSValueRef(JSContextRef ctx, Object^ instance) {
-	JSPrivateObject* poc = new JSPrivateObject();
-	poc->object = instance;
-	poc->type = JSPrivateObjectTypeID;
-	JSObjectRef object = JSObjectMake(ctx, CreateClassForObject(), poc);
-	JSObjectRef value = JSObjectMake(ctx, CreateClassForObjectConstructor(), 0);
-
-	JSStringRef cproperty = JSStringCreateWithUTF8CString("constructor");
-	JSObjectSetProperty(ctx, object, cproperty, value, kJSPropertyAttributeDontEnum, 0);
-	JSStringRelease(cproperty);
-
-	JSStringRef nameProperty = JSStringCreateWithUTF8CString("name");
-	JSStringRef valueProperty = JSStringCreateWithUTF8CString("Object");
-	JSValueRef valueRef = JSValueMakeString(ctx, valueProperty);
-	JSObjectSetProperty(ctx, value, nameProperty, valueRef, kJSPropertyAttributeDontEnum, 0);
-	JSStringRelease(nameProperty);
-	JSStringRelease(valueProperty);
-
-	return object;
 }

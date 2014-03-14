@@ -1,0 +1,37 @@
+var Tray = require('../controls/tray.hjs'),
+	Capture = require('./capture.hjs');
+
+/*
+ Public API.
+ */
+exports.show = show;
+
+/*
+ Implementation.
+ */
+function show() {
+	var window = Window.Current,
+		container = new Canvas();
+
+	container.Background = new SolidColorBrush(new Color(80, 255, 0, 0));
+
+	var canvas = new Canvas(),
+		background = new ImageBrush(),
+		uri = new Uri('https://dl.dropboxusercontent.com/u/16441391/temp/hyperloopme/logo.good.png');
+	background.ImageSource = new BitmapImage(uri);
+	canvas.Background = background;
+	canvas.Width = 217;
+	canvas.Height = 200;
+	Canvas.SetTop(canvas, window.Bounds.Height / 2 - canvas.Height / 2);
+	Canvas.SetLeft(canvas, window.Bounds.Width / 2 - canvas.Width / 2);
+	container.Children.Append(canvas);
+
+	container.Children.Append(new Tray([
+		{
+			text: 'Hyperloop Me!',
+			handler: Capture.show
+		}
+	]));
+
+	window.Content = container;
+}

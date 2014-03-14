@@ -34,6 +34,14 @@ function Processor() {
 
 Processor.prototype.__proto__ = EventEmitter.prototype;
 
+function padRight(s,l) {
+	var ns = s;
+	for (var c=s.length;c<l;c++) {
+		ns+=' ';
+	}
+	return ns;
+}
+
 /**
  * parse out the command line into a specific set of options and
  * arguments.
@@ -83,8 +91,8 @@ processor.on('help',function(){
 
 	hyperloop.getCommands().forEach(function(cmd){
 		var help = cmd.getHelp(),
-			name = cmd.getName();
-		log.log("  "+name.magenta+"                "+help.grey);
+			name = padRight(cmd.getName(),22);
+		log.log("  "+name.magenta+" "+help.grey);
 	});
 
 	log.log("");
@@ -100,6 +108,12 @@ processor.on('help',function(){
 	log.log("  --src=<s>".cyan+"              native source file to include in compile".grey);
 	log.log("  --dest=<d>".cyan+"             destination directory to write output".grey);
 	log.log("  --log-level=<l>".cyan+"        set the logging level (default 'info')".grey);
+
+	if (/^win/.test(process.platform)) {
+		log.log("  --configuration=<n>".cyan+"    set Configuration for msbuild (default 'Debug')".grey);
+		log.log("  --identity-name=<n>".cyan+"    set Package.appxmanifest Identity Name (default 'hyperlooptest.NAME')".grey);
+	}
+
 	log.log("");
 	process.exit(0);
 });
@@ -119,6 +133,10 @@ processor.on('debug',function(v){
 
 processor.on('log-level', function(v) {
 	log.level = v;
+});
+
+processor.on('report', function(v) {
+	log.report = true;
 });
 
 processor.parse(function(err,options,args){
