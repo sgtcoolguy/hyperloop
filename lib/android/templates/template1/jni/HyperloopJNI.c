@@ -88,6 +88,13 @@ JSGlobalContextRef HyperloopCreateVM()
                       MakeObjectConstructorForJava_java_lang_String(globalContextRef)); /* java.lang.String */
     JS_registerObject(globalContextRef, android_util_ObjectRef, "Log",
                       MakeObjectConstructorForJava_android_util_Log(globalContextRef)); /* android.util.Log */
+	
+    JSStringRef js_name = JSStringCreateWithUTF8CString("var console = {}; console.log = android.util.Log.d");
+	JSEvaluateScript(globalContextRef, js_name,  NULL, NULL, 0, NULL);
+	JSStringRelease(js_name);
+
+		
+	
 #if 0
 	JS_registerObject(globalContextRef, android_view_ObjectRef, "Gravity",
                       MakeObjectConstructorForJava_android_view_Gravity(globalContextRef)); /* android.view.Gravity */
