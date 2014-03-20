@@ -26,5 +26,5 @@ LOCAL_CFLAGS    := -std=c99
 include $(BUILD_SHARED_LIBRARY)
 
 # Remember: The NDK_MODULE_PATH environmental variable must contain the modules directories in the search path.
-$(call import-module,BUILD_webkit2)
+$(call import-module,JavaScriptCore)
 
