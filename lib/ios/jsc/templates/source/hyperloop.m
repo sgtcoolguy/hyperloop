@@ -663,6 +663,7 @@ id HyperloopDynamicInvokeWithSentinel(JSContextRef ctx, const JSValueRef *argume
         args[c]=arg;
     }
 
+
     // hack, how else can you invoke a vararg IMP. i can't find any other way
     switch(argumentCount) {
         case 1: {
