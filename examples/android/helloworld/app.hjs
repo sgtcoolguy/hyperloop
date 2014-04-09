@@ -1,1 +1,3 @@
-// andorid.util.Log.d('Hello, World!');
+@import("android.util.Log");
+
+Log.d('Hello, World!');
