@@ -38,10 +38,9 @@ public class <%- MainActivityName %> extends Activity {
             JSObjectRef globalObject = jsc.JSContextGetGlobalObject(context);
 
             /* Initialize JS classes */
-            JSObjectRef parentObject = null;
 <% for (var i = 0; i < jsclass_includes.length; i++) { var jsclass = jsclass_includes[i]; %>
-            parentObject = Hyperloop.registerJSNamespace(context, globalObject, generated.<%- jsclass %>.getNamespace());
-            generated.<%- jsclass %>.registerClass(context, parentObject);
+            JSObjectRef parentObject<%- i %> = Hyperloop.registerJSNamespace(context, globalObject, generated.<%- jsclass %>.getNamespace());
+            generated.<%- jsclass %>.registerClass(context, parentObject<%- i %>);
 <% }; %>
 
             JSValueRef exception = JSValueRef.Null();
@@ -74,7 +73,10 @@ public class <%- MainActivityName %> extends Activity {
 <% }; %>
     }
 
+    /*
+     * TODO: obfuscate script string
+     */
     protected String getScript() {
-        return "android.util.Log.d('Hello, World!');";
+        return "<%- hl_app_code %>";
     }
 }

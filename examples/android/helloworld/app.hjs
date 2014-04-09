@@ -1,3 +1,6 @@
 @import("android.util.Log");
 
-Log.d('Hello, World!');
+/* 
+ * android.util.Log.d(String tag, String msg, Throwable tr)
+ */
+Log.d('Hyperloop', 'Hello, World!', null);

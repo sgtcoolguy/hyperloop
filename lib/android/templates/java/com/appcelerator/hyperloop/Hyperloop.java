@@ -108,7 +108,12 @@ public class Hyperloop {
 
     public static void checkJSException(JSContextRef context, JSValueRef exception) {
         if (!jsc.JSValueIsNull(context, exception)) {
-            throw new JavaScriptException(exception.toString());
+            Object object = exception.castToObject().getPrivateObject();
+            if (object != null) {
+                throw new JavaScriptException(object.toString());
+            } else {
+                throw new JavaScriptException(exception.toString());
+            }
         }
     }
 }
