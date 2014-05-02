@@ -449,7 +449,8 @@ JSValueRef HyperloopLogger (JSContextRef ctx, JSObjectRef function, JSObjectRef 
         NSMutableArray *array = [NSMutableArray array];
         for (size_t c=0;c<argumentCount;c++)
         {
-            [array addObject:HyperloopToNSString(ctx,arguments[c])];
+            id s = HyperloopToNSString(ctx,arguments[c]);
+            [array addObject:s ? s : @"<null>"];
         }
         NSLog(@"%@", [array componentsJoinedByString:@" "]);
     }
