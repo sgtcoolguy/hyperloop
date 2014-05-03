@@ -171,3 +171,11 @@ NSDictionary* HyperloopSourceMap(JSContextRef context, NSString *prefix, NSStrin
  * register a try/catch handler which will process special native exceptions
  */
 void HyperloopRegisterTryCatchHandler(JSContextRef ctx);
+
+#ifdef USE_TIJSCORE
+typedef void (^HyperloopBlock)(void);
+/**
+ * invoke a block on a specific kroll thread
+ */
+void HyperloopPerformBlockOnKrollThread (NSThread *thread, HyperloopBlock block, BOOL wait);
+#endif
