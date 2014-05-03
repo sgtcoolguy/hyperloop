@@ -449,7 +449,8 @@ JSValueRef HyperloopLogger (JSContextRef ctx, JSObjectRef function, JSObjectRef 
         NSMutableArray *array = [NSMutableArray array];
         for (size_t c=0;c<argumentCount;c++)
         {
-            [array addObject:HyperloopToNSString(ctx,arguments[c])];
+            id s = HyperloopToNSString(ctx,arguments[c]);
+            [array addObject:s ? s : @"<null>"];
         }
         NSLog(@"%@", [array componentsJoinedByString:@" "]);
     }
@@ -1132,3 +1133,67 @@ void HyperloopRegisterTryCatchHandler(JSContextRef ctx)
     }
     JSStringRelease(property);
 }
+
+#ifdef USE_TIJSCORE
+
+@interface HyperloopThreadBlock : NSObject
+-(void)run;
+@property(nonatomic,copy) HyperloopBlock block;
+@end
+
+@implementation HyperloopThreadBlock
+-(void)dealloc
+{
+    [self.block release];
+    [super dealloc];
+}
+-(void)run
+{
+    self.block();
+}
+@end
+
+@interface KrollContext
+-(NSString*)threadName;
+-(void)invokeOnThread:(id)o method:(SEL)sel withObject:(id)obj condition:(NSCondition*)cond;
+@end
+@interface KrollBridge
++(NSArray *)krollContexts;
+@end
+/**
+ * invoke a block on a specific kroll thread
+ */
+void HyperloopPerformBlockOnKrollThread (NSThread *thread, HyperloopBlock block, BOOL wait)
+{
+@autoreleasepool
+{
+    NSArray *contexts = [KrollBridge krollContexts];
+    KrollContext *ctx = nil;
+    if ([contexts count]==1)
+    {
+        ctx = [contexts objectAtIndex:0];        
+    }
+    else 
+    {
+        NSString *threadName = [thread name];
+        // find the right kroll context by our thread
+        for (KrollContext *c in contexts)
+        {
+            if ([[c threadName] isEqualToString:threadName])
+            {
+                ctx = c;
+                break;
+            }
+        }
+    }
+    HyperloopThreadBlock *object = [[HyperloopThreadBlock new] autorelease];
+    object.block = block;
+    NSCondition *condition = wait ? [[NSCondition new] autorelease] : nil;
+    [ctx invokeOnThread:object method:@selector(run) withObject:nil condition:condition];
+    if (wait) 
+    {
+        [condition wait];
+    }
+}
+}
+#endif
