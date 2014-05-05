@@ -7,7 +7,7 @@
  * or patents pending by Appcelerator, Inc.
  */
 #import "Module.h"
-#import <hyperloop.h>
+#import "hyperloop.h"
 #import "NSException+NSExceptionHyperloopAdditions.h"
 #ifndef HL_DISABLE_CRASH
 #import <KSCrash/KSCrash.h>
