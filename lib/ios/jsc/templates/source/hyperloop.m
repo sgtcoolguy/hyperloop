@@ -111,7 +111,6 @@ void HyperloopDestroyPrivateObject(JSObjectRef object)
     if (p!=NULL)
     {
         [p release];
-        JSObjectSetPrivate(object,0);
     }
 }
 
