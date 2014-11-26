@@ -8,7 +8,7 @@
  */
 
 #import "JSBuffer.h"
-#import <hyperloop.h>
+#import "hyperloop.h"
 #import <malloc/malloc.h>
 
 

@@ -1,0 +1,339 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C937174D1916F006003FB523 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C937174C1916F006003FB523 /* Foundation.framework */; };
+		C937177E1916F087003FB523 /* hyperloop.m in Sources */ = {isa = PBXBuildFile; fileRef = C93717741916F087003FB523 /* hyperloop.m */; };
+		C937177F1916F087003FB523 /* JSBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C93717761916F087003FB523 /* JSBuffer.m */; };
+		C93717801916F087003FB523 /* JSOwner.m in Sources */ = {isa = PBXBuildFile; fileRef = C93717781916F087003FB523 /* JSOwner.m */; };
+		C93717811916F087003FB523 /* Module.m in Sources */ = {isa = PBXBuildFile; fileRef = C937177A1916F087003FB523 /* Module.m */; };
+		C93717821916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C937177C1916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.m */; };
+		C93717861916FC52003FB523 /* KSCrash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C93717831916F80F003FB523 /* KSCrash.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C93717471916F006003FB523 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		C93717491916F006003FB523 /* libhyperloop.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhyperloop.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C937174C1916F006003FB523 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		C93717501916F006003FB523 /* hyperloop-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "hyperloop-Prefix.pch"; sourceTree = "<group>"; };
+		C93717721916F087003FB523 /* Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Blocks.h; path = ../../Blocks.h; sourceTree = "<group>"; };
+		C93717731916F087003FB523 /* hyperloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hyperloop.h; path = ../../hyperloop.h; sourceTree = "<group>"; };
+		C93717741916F087003FB523 /* hyperloop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = hyperloop.m; path = ../../hyperloop.m; sourceTree = "<group>"; };
+		C93717751916F087003FB523 /* JSBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSBuffer.h; path = ../../JSBuffer.h; sourceTree = "<group>"; };
+		C93717761916F087003FB523 /* JSBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSBuffer.m; path = ../../JSBuffer.m; sourceTree = "<group>"; };
+		C93717771916F087003FB523 /* JSOwner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSOwner.h; path = ../../JSOwner.h; sourceTree = "<group>"; };
+		C93717781916F087003FB523 /* JSOwner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSOwner.m; path = ../../JSOwner.m; sourceTree = "<group>"; };
+		C93717791916F087003FB523 /* Module.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Module.h; path = ../../Module.h; sourceTree = "<group>"; };
+		C937177A1916F087003FB523 /* Module.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Module.m; path = ../../Module.m; sourceTree = "<group>"; };
+		C937177B1916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSException+NSExceptionHyperloopAdditions.h"; path = "../../NSException+NSExceptionHyperloopAdditions.h"; sourceTree = "<group>"; };
+		C937177C1916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSException+NSExceptionHyperloopAdditions.m"; path = "../../NSException+NSExceptionHyperloopAdditions.m"; sourceTree = "<group>"; };
+		C937177D1916F087003FB523 /* ticurrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ticurrent.h; path = ../../ticurrent.h; sourceTree = "<group>"; };
+		C93717831916F80F003FB523 /* KSCrash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KSCrash.framework; path = ../../../../../../deps/ios/KSCrash.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C93717461916F006003FB523 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C93717861916FC52003FB523 /* KSCrash.framework in Frameworks */,
+				C937174D1916F006003FB523 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C93717401916F006003FB523 = {
+			isa = PBXGroup;
+			children = (
+				C937174E1916F006003FB523 /* hyperloop */,
+				C937174B1916F006003FB523 /* Frameworks */,
+				C937174A1916F006003FB523 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C937174A1916F006003FB523 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C93717491916F006003FB523 /* libhyperloop.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C937174B1916F006003FB523 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C93717831916F80F003FB523 /* KSCrash.framework */,
+				C937174C1916F006003FB523 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C937174E1916F006003FB523 /* hyperloop */ = {
+			isa = PBXGroup;
+			children = (
+				C93717721916F087003FB523 /* Blocks.h */,
+				C93717731916F087003FB523 /* hyperloop.h */,
+				C93717741916F087003FB523 /* hyperloop.m */,
+				C93717751916F087003FB523 /* JSBuffer.h */,
+				C93717761916F087003FB523 /* JSBuffer.m */,
+				C93717771916F087003FB523 /* JSOwner.h */,
+				C93717781916F087003FB523 /* JSOwner.m */,
+				C93717791916F087003FB523 /* Module.h */,
+				C937177A1916F087003FB523 /* Module.m */,
+				C937177B1916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.h */,
+				C937177C1916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.m */,
+				C937177D1916F087003FB523 /* ticurrent.h */,
+				C937174F1916F006003FB523 /* Supporting Files */,
+			);
+			path = hyperloop;
+			sourceTree = "<group>";
+		};
+		C937174F1916F006003FB523 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				C93717501916F006003FB523 /* hyperloop-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C93717481916F006003FB523 /* hyperloop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C937176C1916F006003FB523 /* Build configuration list for PBXNativeTarget "hyperloop" */;
+			buildPhases = (
+				C93717851916F9ED003FB523 /* ShellScript */,
+				C93717451916F006003FB523 /* Sources */,
+				C93717461916F006003FB523 /* Frameworks */,
+				C93717471916F006003FB523 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hyperloop;
+			productName = hyperloop;
+			productReference = C93717491916F006003FB523 /* libhyperloop.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C93717411916F006003FB523 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = Appcelerator;
+			};
+			buildConfigurationList = C93717441916F006003FB523 /* Build configuration list for PBXProject "hyperloop" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = C93717401916F006003FB523;
+			productRefGroup = C937174A1916F006003FB523 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C93717481916F006003FB523 /* hyperloop */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C93717851916F9ED003FB523 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/JSBuffer.m",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"MDL: SRCROOT=${SRCROOT}\"\n\n(cd \"${SRCROOT}/../../../../../../deps/ios\" && echo \"${PWD}\")";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C93717451916F006003FB523 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C937177F1916F087003FB523 /* JSBuffer.m in Sources */,
+				C93717811916F087003FB523 /* Module.m in Sources */,
+				C93717821916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.m in Sources */,
+				C937177E1916F087003FB523 /* hyperloop.m in Sources */,
+				C93717801916F087003FB523 /* JSOwner.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C937176A1916F006003FB523 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "\"${SRCROOT}/../../../../../../deps/ios\"";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					HL_DISABLE_CRASH,
+					USE_TIJSCORE,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.5.0/iphone/headers\"",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		C937176B1916F006003FB523 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = "\"${SRCROOT}/../../../../../../deps/ios\"";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					HL_DISABLE_CRASH,
+					USE_TIJSCORE,
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.5.0/iphone/headers\"",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C937176D1916F006003FB523 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/hyperloop.dst;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/matt/Documents/Appcelerator/projects/core_runtime/ti.next/hyperloop/deps/ios,
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "hyperloop/hyperloop-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		C937176E1916F006003FB523 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/hyperloop.dst;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/matt/Documents/Appcelerator/projects/core_runtime/ti.next/hyperloop/deps/ios,
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "hyperloop/hyperloop-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C93717441916F006003FB523 /* Build configuration list for PBXProject "hyperloop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C937176A1916F006003FB523 /* Debug */,
+				C937176B1916F006003FB523 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C937176C1916F006003FB523 /* Build configuration list for PBXNativeTarget "hyperloop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C937176D1916F006003FB523 /* Debug */,
+				C937176E1916F006003FB523 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C93717411916F006003FB523 /* Project object */;
+}
