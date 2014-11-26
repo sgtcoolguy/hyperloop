@@ -114,4 +114,4 @@
 #define JSValueGetType TiValueGetType
 #define JSStartProfiling TiStartProfiling
 #define JSEndProfiling TiEndProfiling
-#define JSChar TiChar
+/*#define JSChar TiChar*/

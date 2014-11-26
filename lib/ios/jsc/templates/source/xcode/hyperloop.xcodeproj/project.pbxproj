@@ -29,9 +29,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C93717491916F006003FB523 /* libstatic_library.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libstatic_library.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C93717491916F006003FB523 /* libhyperloop.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhyperloop.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C937174C1916F006003FB523 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		C93717501916F006003FB523 /* static_library-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "static_library-Prefix.pch"; sourceTree = "<group>"; };
+		C93717501916F006003FB523 /* hyperloop-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "hyperloop-Prefix.pch"; sourceTree = "<group>"; };
 		C93717721916F087003FB523 /* Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Blocks.h; path = ../../Blocks.h; sourceTree = "<group>"; };
 		C93717731916F087003FB523 /* hyperloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hyperloop.h; path = ../../hyperloop.h; sourceTree = "<group>"; };
 		C93717741916F087003FB523 /* hyperloop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = hyperloop.m; path = ../../hyperloop.m; sourceTree = "<group>"; };
@@ -63,7 +63,7 @@
 		C93717401916F006003FB523 = {
 			isa = PBXGroup;
 			children = (
-				C937174E1916F006003FB523 /* static_library */,
+				C937174E1916F006003FB523 /* hyperloop */,
 				C937174B1916F006003FB523 /* Frameworks */,
 				C937174A1916F006003FB523 /* Products */,
 			);
@@ -72,7 +72,7 @@
 		C937174A1916F006003FB523 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C93717491916F006003FB523 /* libstatic_library.a */,
+				C93717491916F006003FB523 /* libhyperloop.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -86,7 +86,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C937174E1916F006003FB523 /* static_library */ = {
+		C937174E1916F006003FB523 /* hyperloop */ = {
 			isa = PBXGroup;
 			children = (
 				C93717721916F087003FB523 /* Blocks.h */,
@@ -103,13 +103,13 @@
 				C937177D1916F087003FB523 /* ticurrent.h */,
 				C937174F1916F006003FB523 /* Supporting Files */,
 			);
-			path = static_library;
+			path = hyperloop;
 			sourceTree = "<group>";
 		};
 		C937174F1916F006003FB523 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				C93717501916F006003FB523 /* static_library-Prefix.pch */,
+				C93717501916F006003FB523 /* hyperloop-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -117,9 +117,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C93717481916F006003FB523 /* static_library */ = {
+		C93717481916F006003FB523 /* hyperloop */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C937176C1916F006003FB523 /* Build configuration list for PBXNativeTarget "static_library" */;
+			buildConfigurationList = C937176C1916F006003FB523 /* Build configuration list for PBXNativeTarget "hyperloop" */;
 			buildPhases = (
 				C93717851916F9ED003FB523 /* ShellScript */,
 				C93717451916F006003FB523 /* Sources */,
@@ -130,9 +130,9 @@
 			);
 			dependencies = (
 			);
-			name = static_library;
-			productName = static_library;
-			productReference = C93717491916F006003FB523 /* libstatic_library.a */;
+			name = hyperloop;
+			productName = hyperloop;
+			productReference = C93717491916F006003FB523 /* libhyperloop.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -144,7 +144,7 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Appcelerator;
 			};
-			buildConfigurationList = C93717441916F006003FB523 /* Build configuration list for PBXProject "static_library" */;
+			buildConfigurationList = C93717441916F006003FB523 /* Build configuration list for PBXProject "hyperloop" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -156,7 +156,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C93717481916F006003FB523 /* static_library */,
+				C93717481916F006003FB523 /* hyperloop */,
 			);
 		};
 /* End PBXProject section */
@@ -198,8 +198,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				"ARCHS[sdk=iphoneos*]" = armv7;
-				"ARCHS[sdk=iphonesimulator*]" = i386;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -233,7 +231,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.2.2.GA/iphone/headers\"",
+					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.5.0/iphone/headers\"",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = YES;
@@ -245,8 +243,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				"ARCHS[sdk=iphoneos*]" = armv7;
-				"ARCHS[sdk=iphonesimulator*]" = i386;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -276,7 +272,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.2.2.GA/iphone/headers\"",
+					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.5.0/iphone/headers\"",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				SDKROOT = iphoneos;
@@ -287,13 +283,13 @@
 		C937176D1916F006003FB523 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DSTROOT = /tmp/static_library.dst;
+				DSTROOT = /tmp/hyperloop.dst;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/matt/Documents/Appcelerator/projects/core_runtime/ti.next/hyperloop/deps/ios,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "static_library/static_library-Prefix.pch";
+				GCC_PREFIX_HEADER = "hyperloop/hyperloop-Prefix.pch";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -303,13 +299,13 @@
 		C937176E1916F006003FB523 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DSTROOT = /tmp/static_library.dst;
+				DSTROOT = /tmp/hyperloop.dst;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/matt/Documents/Appcelerator/projects/core_runtime/ti.next/hyperloop/deps/ios,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "static_library/static_library-Prefix.pch";
+				GCC_PREFIX_HEADER = "hyperloop/hyperloop-Prefix.pch";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -319,7 +315,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C93717441916F006003FB523 /* Build configuration list for PBXProject "static_library" */ = {
+		C93717441916F006003FB523 /* Build configuration list for PBXProject "hyperloop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C937176A1916F006003FB523 /* Debug */,
@@ -328,7 +324,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C937176C1916F006003FB523 /* Build configuration list for PBXNativeTarget "static_library" */ = {
+		C937176C1916F006003FB523 /* Build configuration list for PBXNativeTarget "hyperloop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C937176D1916F006003FB523 /* Debug */,

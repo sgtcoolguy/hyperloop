@@ -9,7 +9,7 @@
 #ifndef USE_TIJSCORE
 @import JavaScriptCore;
 #else
-#include <TiCore/TiCore.h>
+#include <JavaScriptCore/TiCore.h>
 #include "ticurrent.h"
 #endif
 
