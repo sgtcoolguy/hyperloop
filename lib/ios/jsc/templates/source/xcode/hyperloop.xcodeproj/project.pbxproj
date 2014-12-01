@@ -45,6 +45,7 @@
 		C937177C1916F087003FB523 /* NSException+NSExceptionHyperloopAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSException+NSExceptionHyperloopAdditions.m"; path = "../../NSException+NSExceptionHyperloopAdditions.m"; sourceTree = "<group>"; };
 		C937177D1916F087003FB523 /* ticurrent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ticurrent.h; path = ../../ticurrent.h; sourceTree = "<group>"; };
 		C93717831916F80F003FB523 /* KSCrash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = KSCrash.framework; path = ../../../../../../deps/ios/KSCrash.framework; sourceTree = "<group>"; };
+		C9BAC1A81A2D1331008C6C8A /* titanium.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = titanium.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +64,7 @@
 		C93717401916F006003FB523 = {
 			isa = PBXGroup;
 			children = (
+				C9BAC1A81A2D1331008C6C8A /* titanium.xcconfig */,
 				C937174E1916F006003FB523 /* hyperloop */,
 				C937174B1916F006003FB523 /* Frameworks */,
 				C937174A1916F006003FB523 /* Products */,
@@ -196,6 +198,7 @@
 /* Begin XCBuildConfiguration section */
 		C937176A1916F006003FB523 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C9BAC1A81A2D1331008C6C8A /* titanium.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -231,7 +234,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.5.0/iphone/headers\"",
+					"\"$(TITANIUM_SDK)/iphone/headers\"",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = YES;
@@ -241,6 +244,7 @@
 		};
 		C937176B1916F006003FB523 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C9BAC1A81A2D1331008C6C8A /* titanium.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -272,7 +276,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"\"/Users/matt/Library/Application Support/Titanium/mobilesdk/osx/3.5.0/iphone/headers\"",
+					"\"$(TITANIUM_SDK)/iphone/headers\"",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				SDKROOT = iphoneos;
